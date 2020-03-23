@@ -20,7 +20,7 @@ use File::Type;
 
 
 my $CONSOLE=Win32::Console->new;
-$CONSOLE->Title('BwE BIN Comparator');
+$CONSOLE->Title('BwE File Comparator');
 
 START:
 
@@ -31,21 +31,21 @@ my $BwE = (colored ['bold red'], qq{
 |             |    |  _//  \\/ \\/  /|  __)_                |
 |             |    |   \\\\        //       \\               |
 |             |______  / \\__/\\__//______  /               |
-|                    \\/ BIN Comparator  \\/ v1.0           |
+|                    \\/ File Comparator \\/ v1.0           |
 |        		                                  |
 ===========================================================\n\n});
 print $BwE;
 
 my @files=(); 
 
-while (<*.bin>) 
+while (<*.*>) 
 {
     push (@files, $_) if (-s gt "1");
 }
 
 if ( @files <= 1 ) {
 	print "There is nothing to compare...\n"; 
-	goto EOF;
+	goto END;
 } 
 
 open(F,'>', "output.txt") || die $!;
@@ -58,13 +58,13 @@ print "4. Dynamic Offset MD5 Calculation (Size - MD5 - Filename)\n"; #
 
 print colored ['bold red'], "\nStatistical Analysis\n";
 print "5. Compare Offsets Entropy (log2(256)) (Entropy - Filename)\n"; #
-print "6. Compare BIN Entropy (log2(256)) (Entropy - Filename)\n"; #
-print "7. Compare BIN Statistics (00 Count % / FF Count % - Filename)\n"; #
+print "6. Compare Entropy (log2(256)) (Entropy - Filename)\n"; #
+print "7. Compare Statistics (00 Count % / FF Count % - Filename)\n"; #
 
-print colored ['bold red'], "\nHash Analysis\n";
-print "8. Obtain BIN File MD5s (MD5 Hash - Filename)\n"; #
-print "9. Obtain BIN File SHA1s (SHA1 Hash - Filename)\n"; #
-print "10. Obtain BIN MIME Type (MIME - Filename)\n"; #
+print colored ['bold red'], "\nHash/Other Analysis\n";
+print "8. Obtain File MD5s (MD5 Hash - Filename)\n"; #
+print "9. Obtain File SHA1s (SHA1 Hash - Filename)\n"; #
+print "10. Obtain MIME Types (MIME - Filename)\n"; #
 
 
 print "\nChoose Option: "; 
@@ -250,7 +250,7 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "6") { # Compare BIN Entropy (log2(256)) (Entropy - Filename)
+elsif ($option eq "6") { # Compare Entropy (log2(256)) (Entropy - Filename)
 
 print "\n"; 
 
@@ -319,7 +319,7 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "8") { # Obtain BIN File MD5s (MD5 Hash - Filename)
+elsif ($option eq "8") { # Obtain File MD5s (MD5 Hash - Filename)
 
 print "\n"; 
 
@@ -339,7 +339,7 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "9") { # Obtain BIN File SHA1 (SHA1 Hash - Filename)
+elsif ($option eq "9") { # Obtain Files SHA1 (SHA1 Hash - Filename)
 
 print "\n"; 
 
@@ -359,9 +359,9 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "10") { # Obtain BIN MIME Type (MIME - Filename)
+elsif ($option eq "10") { # Obtain MIME Types (MIME - Filename)
 
-foreach my $file (@files) { ### Getting MIME Type 
+foreach my $file (@files) { ### Getting MIME Types 
 
 my $ft = File::Type->new();
 my $type_1 = $ft->mime_type($file);
@@ -376,6 +376,9 @@ my $opensysfile = system("output.txt");
 goto EOF;
 }
 
+else {
+goto END;
+}
 
 EOF:
 
@@ -392,7 +395,7 @@ goto START;
 
 END:
 
-print "\n\nPress Enter to Exit... ";
+print "\nPress Enter to Exit... ";
 while (<>) {
 chomp;
 last unless length;
