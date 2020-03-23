@@ -1,5 +1,5 @@
 # BwE File Comparator
-Tool for analysing and comparing files but is mainly intended for binary files (firmware flashes, executables, malware etc).
+Tool for analysing and comparing files (in bulk) but is mainly intended for binary files (firmware flashes, executables, malware etc).
 
 Performs the following functions:
 
