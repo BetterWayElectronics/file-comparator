@@ -31,7 +31,7 @@ my $BwE = (colored ['bold red'], qq{
 |             |    |  _//  \\/ \\/  /|  __)_                |
 |             |    |   \\\\        //       \\               |
 |             |______  / \\__/\\__//______  /               |
-|                    \\/ File Comparator \\/ v1.0           |
+|                    \\/ File Comparator \\/ v1.1           |
 |        		                                  |
 ===========================================================\n\n});
 print $BwE;
@@ -40,7 +40,7 @@ my @files=();
 
 while (<*.*>) 
 {
-    push (@files, $_) if (-s gt "1");
+    push (@files, $_) if (-s gt "10");
 }
 
 if ( @files <= 1 ) {
@@ -48,23 +48,28 @@ if ( @files <= 1 ) {
 	goto END;
 } 
 
+my $filecount = scalar @files;
+
 open(F,'>', "output.txt") || die $!;
 
+print "You will be comparing $filecount files.\n\n";
+
 print colored ['bold red'], "Comparative Analysis\n";
-print "1. Compare Offsets (Result - Filename)\n"; #
-print "2. Compare Offsets MD5 (MD5 Hash - Filename)\n"; #
-print "3. Double Offsets Comparison (Result 1 - Result 2 - Filename)\n"; #
-print "4. Dynamic Offset MD5 Calculation (Size - MD5 - Filename)\n"; #
+print "1. Compare Offsets (Hex) (Result - Filename)\n"; #
+print "2. Compare Offsets (ASCII) (Result - Filename)\n"; #
+print "3. Compare Offsets MD5 (MD5 Hash - Filename)\n"; #
+print "4. Dual Offsets Comparison (Result 1 - Result 2 - Filename)\n"; #
+print "5. Dynamic Offset MD5 Calculation (Size - MD5 - Filename)\n"; #
 
 print colored ['bold red'], "\nStatistical Analysis\n";
-print "5. Compare Offsets Entropy (log2(256)) (Entropy - Filename)\n"; #
-print "6. Compare Entropy (log2(256)) (Entropy - Filename)\n"; #
-print "7. Compare Statistics (00 Count % / FF Count % - Filename)\n"; #
+print "6. Compare Offsets Entropy (log2(256)) (Entropy - Filename)\n"; #
+print "7. Compare File Entropy (log2(256)) (Entropy - Filename)\n"; #
+print "8. Compare File Statistics (00 Count % / FF Count % - Filename)\n"; #
 
 print colored ['bold red'], "\nHash/Other Analysis\n";
-print "8. Obtain File MD5s (MD5 Hash - Filename)\n"; #
-print "9. Obtain File SHA1s (SHA1 Hash - Filename)\n"; #
-print "10. Obtain MIME Types (MIME - Filename)\n"; #
+print "9. Obtain File MD5s (MD5 Hash - Filename)\n"; #
+print "10. Obtain File SHA1s (SHA1 Hash - Filename)\n"; #
+print "11. Obtain MIME Types (MIME - Filename)\n"; #
 
 
 print "\nChoose Option: "; 
@@ -74,7 +79,7 @@ my $clear_screen = cls();
 print $clear_screen;
 print $BwE;
 
-if ($option eq "1") { # Compare Offsets (Result - Filename)
+if ($option eq "1") { # Compare Offsets (Hex) (Result - Filename)
 
 print "Enter Offset: "; 
 my $offset = <STDIN>; chomp $offset; 
@@ -86,7 +91,7 @@ $length = hex($length);
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating Results... 
+foreach my $file (@files) { ### Calculating $file Results... 
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 seek($bin, $offset, 0);
@@ -104,7 +109,37 @@ my $opensysfile = system("output.txt");
 goto EOF;
 }  
 
-elsif ($option eq "2") { # Compare Offsets MD5 (MD5 Hash - Filename)
+elsif ($option eq "2") { # Compare Offsets (ASCII) (Result - Filename)
+
+print "Enter Offset: "; 
+my $offset = <STDIN>; chomp $offset; 
+print "Enter Length: "; 
+my $length = <STDIN>; chomp $length; 
+
+$offset = hex($offset);
+$length = hex($length);
+
+print "\n"; 
+
+foreach my $file (@files) { ### Calculating $file Results... 
+open(my $bin, "<", $file) or die $!; binmode $bin;
+
+seek($bin, $offset, 0);
+read($bin, my $output, $length);
+#$output = uc ascii_to_hex($output); 
+
+print F "$output - $file\n";
+
+}
+close(F); 
+print $clear_screen;
+print $BwE;
+print "Mission Complete!";
+my $opensysfile = system("output.txt");
+goto EOF;
+}  
+
+elsif ($option eq "3") { # Compare Offsets MD5 (MD5 Hash - Filename)
 
 
 print "Enter Offset: "; 
@@ -117,7 +152,7 @@ $length = hex($length);
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating MD5's... 
+foreach my $file (@files) { ### Calculating $file MD5... 
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 seek($bin, $offset, 0);
@@ -137,7 +172,7 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "3") { # Double Offsets Comparison (Result 1 - Result 2 - Filename)
+elsif ($option eq "4") { # Dual Offsets Comparison (Result 1 - Result 2 - Filename)
 
 print "Enter Offset 1: "; 
 my $offset = <STDIN>; chomp $offset; 
@@ -155,7 +190,7 @@ $length2 = hex($length2);
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating Results... 
+foreach my $file (@files) { ### Calculating $file Results... 
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 seek($bin, $offset, 0);
@@ -177,7 +212,7 @@ my $opensysfile = system("output.txt");
 goto EOF;
 }  
 
-elsif ($option eq "4") { # Dynamic Offset MD5 Calculation (Size - MD5 - Filename)
+elsif ($option eq "5") { # Dynamic Offset MD5 Calculation (Size - MD5 - Filename)
 
 print "Enter Length Location Offset: "; 
 my $offset = <STDIN>; chomp $offset; 
@@ -192,7 +227,7 @@ $offset2 = hex($offset2);
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating Results... 
+foreach my $file (@files) { ### Calculating $file Results... 
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 seek($bin, $offset, 0); 
@@ -216,7 +251,7 @@ my $opensysfile = system("output.txt");
 goto EOF;
 }  
 
-elsif ($option eq "5") { # Compare Offsets Entropy (log2(256)) (Entropy - Filename)
+elsif ($option eq "6") { # Compare Offsets Entropy (log2(256)) (Entropy - Filename)
 
 print "Enter Offset: "; 
 my $offset = <STDIN>; chomp $offset; 
@@ -228,7 +263,7 @@ $length = hex($length);
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating Entropy...    
+foreach my $file (@files) { ### Calculating $file Entropy...    
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 seek($bin, $offset, 0); 
@@ -250,11 +285,11 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "6") { # Compare Entropy (log2(256)) (Entropy - Filename)
+elsif ($option eq "7") { # Compare File Entropy (log2(256)) (Entropy - Filename)
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating Entropy...    
+foreach my $file (@files) { ### Calculating $file Entropy...    
 
 	open(my $bin, "<", $file) or die $!; binmode $bin;
 	
@@ -287,9 +322,9 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "7") { # Compare Offsets Statistics (00 Count % / FF Count % - Filename)
+elsif ($option eq "8") { # Compare File Statistics (00 Count % / FF Count % - Filename)
 
-foreach my $file (@files) { ### Calculating Results... 
+foreach my $file (@files) { ### Calculating $file Results... 
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 	# Byte Counting
@@ -297,7 +332,7 @@ open(my $bin, "<", $file) or die $!; binmode $bin;
 
 
 	my @counts = (0) x 256;
-	while (1) {  ### Counting Bytes...
+	while (1) {  ### Counting $file Bytes...
 	   my $rv = sysread($bin, my $buf, BLOCK_SIZE);
 	   die($!) if !defined($rv);
 	   last if !$rv;
@@ -306,6 +341,7 @@ open(my $bin, "<", $file) or die $!; binmode $bin;
 	}
 	
 	my $filesize = -s $bin;
+	print "\n$file - $filesize";
 	my $FFCountPercent = sprintf("%.2f",($counts[0xFF] / $filesize * 100));
 	my $NullCountPercent = sprintf("%.2f",($counts[0x00] / $filesize * 100));
 	print F "FF: ", $counts[0xFF], " (", $FFCountPercent, "%)", " / 00: ", $counts[0x00], " (", $NullCountPercent, "%)", " - ", $file , "\n";
@@ -319,11 +355,11 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "8") { # Obtain File MD5s (MD5 Hash - Filename)
+elsif ($option eq "9") { # Obtain File MD5s (MD5 Hash - Filename)
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating MD5's...    
+foreach my $file (@files) { ### Calculating $file MD5...    
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 my $md5sum = uc Digest::MD5->new->addfile($bin)->hexdigest; 
@@ -339,11 +375,11 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "9") { # Obtain Files SHA1 (SHA1 Hash - Filename)
+elsif ($option eq "10") { # Obtain Files SHA1 (SHA1 Hash - Filename)
 
 print "\n"; 
 
-foreach my $file (@files) { ### Calculating SHA Hash...    
+foreach my $file (@files) { ### Calculating $file SHA Hash...    
 open(my $bin, "<", $file) or die $!; binmode $bin;
 
 my $SHA = uc Digest::SHA->new->addfile($bin)->hexdigest; 
@@ -359,9 +395,9 @@ my $opensysfile = system("output.txt");
 goto EOF;
 } 
 
-elsif ($option eq "10") { # Obtain MIME Types (MIME - Filename)
+elsif ($option eq "11") { # Obtain MIME Types (MIME - Filename)
 
-foreach my $file (@files) { ### Getting MIME Types 
+foreach my $file (@files) { ### Getting $file MIME Type
 
 my $ft = File::Type->new();
 my $type_1 = $ft->mime_type($file);
