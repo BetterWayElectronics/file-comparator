@@ -515,52 +515,40 @@ elsif ($option eq "9") { # Compare File Entropy (log2(256)) (Entropy - Filename)
 	goto EOF;
 } 
 
-elsif ($option eq "10") { # Compare Offsets Statistics (00 Count % / FF Count % - Filename)
+elsif ($option eq "10") { # Compare File Statistics (00 Count % / FF Count % - Filename)
 
-	print "Enter Offset: "; 
-	my $offset = <STDIN>; chomp $offset; 
-	print "Enter Length: "; 
-	my $length = <STDIN>; chomp $length; 
+	print "\n"; 
 
-	$offset = hex($offset);
-	$length = hex($length);
-
-	foreach my $file (@files) { ### Calculating $file Results...
-
-		open(my $bin, "<", $file) or die $!;
-		binmode $bin;
+	foreach my $file (@files) { ### Calculating $file Results... 
+	open(my $bin, "<", $file) or die $!; binmode $bin;
 
 		# Byte Counting
 		use constant BLOCK_SIZE => 4*1024*1024;
 
+
 		my @counts = (0) x 256;
-		seek($bin, $offset, 0); # Move to the specified offset
+		while (1) {  ### Counting $file Bytes...
+		   my $rv = sysread($bin, my $buf, BLOCK_SIZE);
+		   die($!) if !defined($rv);
+		   last if !$rv;
 
-		my $bytes_read = 0;
-		while ($bytes_read < $length) {  ### Counting $file Bytes...
-			my $read_size = ($bytes_read + BLOCK_SIZE > $length) ? $length - $bytes_read : BLOCK_SIZE;
-			my $rv = sysread($bin, my $buf, $read_size);
-			die($!) if !defined($rv);
-			last if !$rv;
-
-			++$counts[$_] for unpack 'C*', $buf;
-			$bytes_read += $rv;
+		   ++$counts[$_] for unpack 'C*', $buf;
 		}
-
-		# Calculating percentages based on the read length
-		my $filesize = $bytes_read;
+		
+		my $filesize = -s $bin;
 		print "\n$file - $filesize";
-		my $FFCountPercent = sprintf("%.2f", ($counts[0xFF] / $filesize * 100));
-		my $NullCountPercent = sprintf("%.2f", ($counts[0x00] / $filesize * 100));
+		my $FFCountPercent = sprintf("%.2f",($counts[0xFF] / $filesize * 100));
+		my $NullCountPercent = sprintf("%.2f",($counts[0x00] / $filesize * 100));
 		print F "FF: ", $counts[0xFF], " (", $FFCountPercent, "%)", " / 00: ", $counts[0x00], " (", $NullCountPercent, "%)", " - ", $file , "\n";
 		
 	}
 	close(F); 
+	
 	print $clear_screen;
 	print $BwE;
 	print "Mission Complete!\n";
 	
-	my $new_filename = "$option\_-_0x$offset\_-_0x$length\_-_output.txt";
+	my $new_filename = "$option\_-_output.txt";
 	rename "output.txt", $new_filename;
 
 	my $opensysfile = system($new_filename);
