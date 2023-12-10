@@ -413,6 +413,8 @@ elsif ($option eq "7") { # Compare Offsets Entropy (log2(256)) (Entropy - Filena
 	print $BwE;
 	print "Mission Complete!\n";
 	
+	$offset = sprintf("%X", $offset);
+	$length = sprintf("%X", $length);
 	my $new_filename = "$option\_-_0x$offset\_-_0x$length\_-_output.txt";
 	rename "output.txt", $new_filename;
 
@@ -467,6 +469,8 @@ elsif ($option eq "8") { # Compare Offsets Statistics (00 Count % / FF Count % -
 	print $BwE;
 	print "Mission Complete!\n";
 	
+	$offset = sprintf("%X", $offset);
+	$length = sprintf("%X", $length);
 	my $new_filename = "$option\_-_0x$offset\_-_0x$length\_-_output.txt";
 	rename "output.txt", $new_filename;
 
